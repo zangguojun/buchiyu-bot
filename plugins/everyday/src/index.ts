@@ -7,6 +7,7 @@ export function apply(ctx: Context) {
   ctx.middleware((_, next) => {
     // 452055642
     // 532250819
+
     console.log(_.content)
     ctx.app.guild("532250819").on("message", async (session) => {
       if (session.content.includes("学生价") || session.content) {
