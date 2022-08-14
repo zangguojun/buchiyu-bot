@@ -1,6 +1,7 @@
 lib
 dist
 accounts
+logs
 
 node_modules
 npm-debug.log
@@ -8,10 +9,14 @@ yarn-debug.log
 yarn-error.log
 tsconfig.tsbuildinfo
 
+.yalc
+yalc.lock
+
 .eslintcache
 .DS_Store
 .idea
 .vscode
+.vite
 *.suo
 *.ntvs*
 *.njsproj
