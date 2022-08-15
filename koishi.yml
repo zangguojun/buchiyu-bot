@@ -18,7 +18,7 @@ plugins:
     gocqhttp:
       enabled: true
       password: ${{ env.PWD }}
-    selfId: ${{ env.QQ }}
+    selfId: '895346117'
     protocol: ws
     endpoint: ws://127.0.0.1:6700
   echo: {}
