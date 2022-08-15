@@ -24,8 +24,8 @@ export function apply(ctx: Context,{ discountGroup, master }: Config) {
   })
 
   ctx.middleware((_: Session<never, 'shopKeywords'>, next) => {
-    const { channel: { shopKeywords }, bot } = _
-
+    const { channel, bot } = _
+    const { shopKeywords } = channel || {}
     ctx.app.guild(...discountGroup).on("message", async (session) => {
       for await (const keyword of shopKeywords) {
         if (session.content.includes(keyword)) {
