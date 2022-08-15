@@ -11,6 +11,10 @@ plugins:
   status: null
   sandbox: null
   everyday: null
+  shop:
+    discountGroup:
+      - '532250819'
+    master: '1739932260'
   repeater: {}
   database-mongo: {}
   gocqhttp: {}
