@@ -16,14 +16,16 @@ plugins:
       - '532250819'
     master: '1739932260'
   repeater: {}
-  database-mongo: {}
   gocqhttp: {}
   adapter-onebot:
     gocqhttp:
       enabled: true
       password: ${{ env.PWD }}
-    selfId: '895346117'
+    selfId: ${{ env.QQ }}
     protocol: ws
     endpoint: ws://127.0.0.1:6700
   echo: {}
   dataview: {}
+  database-mysql:
+    host: ${{ env.MYSQL_HOST }}
+    password: ${{ env.MYSQL_PWD }}
