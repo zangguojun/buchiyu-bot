@@ -26,7 +26,7 @@ export function apply(ctx: Context) {
   // 处理踢人请求
   ctx.on('message', async (session) => {
     const { messageId, content, guildId, userId } = session
-    if (guildList.includes(guildId) || content === '【我想退群了】') {
+    if (guildList.includes(guildId) && content === '【我想退群了】') {
       // await session.onebot.deleteMsg(messageId)
       await session.onebot.setGroupKick(guildId, userId)
     }
