@@ -14,6 +14,7 @@ plugins:
   shop:
     discountGroup:
       - '532250819'
+      - '452055642'
     master: '1739932260'
   repeater: {}
   gocqhttp: {}
