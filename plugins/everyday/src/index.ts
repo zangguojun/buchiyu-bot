@@ -4,7 +4,7 @@ import '@koishijs/plugin-adapter-onebot'
 
 export const name = 'everyday'
 
-const guildList = [290061546, 795802565, 702547164, 726356752]
+const guildList = ['290061546', '795802565', '702547164', '726356752']
 
 export function apply(ctx: Context) {
   // 处理加群请求
@@ -23,6 +23,15 @@ export function apply(ctx: Context) {
       await session.bot.handleGuildMemberRequest(messageId, false, confuseText)
     }
   })
+  // 处理踢人请求
+  ctx.on('message', async (session) => {
+    const { messageId, content, guildId, userId } = session
+    if (guildList.includes(guildId) || content === '【我想退群了】') {
+      // await session.onebot.deleteMsg(messageId)
+      await session.onebot.setGroupKick(guildId, userId)
+    }
+  })
+
 
   ctx.command('go <message:text>', { authority: 2 })
     .option('anonymous', '-a', { authority: 3 })
