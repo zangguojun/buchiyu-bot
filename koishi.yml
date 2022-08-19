@@ -11,9 +11,11 @@ plugins:
   status: null
   sandbox: null
   everyday: null
+  tool: null
   shop:
     discountGroup:
       - '532250819'
+      - '724924039'
       - '452055642'
     master: '1739932260'
   repeater: {}

@@ -31,12 +31,14 @@
     ]
   },
   "devDependencies": {
+    "@iceworks/spec": "^1.6.0",
     "@koishijs/client": "^4.3.7",
     "@koishijs/scripts": "^3.2.1",
     "@types/node": "^18.7.3",
     "cross-env": "^7.0.3",
     "esbuild": "^0.15.2",
     "esbuild-register": "^3.3.3",
+    "eslint": "^8.22.0",
     "typescript": "^4.7.4",
     "yakumo": "^0.3.3",
     "yakumo-publish": "^0.3.0",
