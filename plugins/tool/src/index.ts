@@ -200,9 +200,9 @@ export function apply(ctx: Context) {
   ctx
     .command('voice <type:text>', { authority: 2 })
     .action(async ({ options, session }, type) => {
-      if (!type) return '请输入需要转换的内容'
+      if (!type) return '请输入需要转换的内容';
       const rst = await ctx.http.get(voiceApi, { params: options, responseType: 'arraybuffer' });
-      return segment('audio', { url: `data:image/*;base64,${rst.toString('base64')}` });
+      return segment('audio', { url: `data:audio/wav;base64,${rst.toString('base64')}` });
     })
     .alias('转语音');
 }
