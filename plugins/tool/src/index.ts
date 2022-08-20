@@ -8,12 +8,14 @@ const beautyPicApi = 'https://api.muxiaoguo.cn/api/meinvtu?api_key=431aa8deeff41
 const acgPicApi = 'https://api.muxiaoguo.cn/api/ACG?api_key=9b4198dee7c75e3c';
 const biliApi = 'https://api.muxiaoguo.cn/api/Bilibili?api_key=81d8e0eb0fbd39ee';
 const hotWordApi = 'https://api.muxiaoguo.cn/api/hybrid?api_key=9f58f965f580763f';
-const searchApi = 'https://api.muxiaoguo.cn/api/Baike?api_key=3eacaebf9af521d3';
 const nowApi = 'https://api.vvhan.com/api/ipCard';
 const str2QrApi = 'https://api.muxiaoguo.cn/api/Qrcode?api_key=0b702cf348c151c7';
 
 const hotListApi = 'https://api.vvhan.com/api/hotlist';
 const voiceApi = 'https://api.vvhan.com/api/song';
+
+const cosplayPicApi = 'https://api.dzzui.com/api/cosplay';
+const searchApi = 'https://api.muxiaoguo.cn/api/Baike?api_key=3eacaebf9af521d3';
 
 export function apply(ctx: Context) {
   // 天气相关
@@ -83,6 +85,19 @@ export function apply(ctx: Context) {
       return segment('image', { url: rst?.data.imgurl });
     })
     .alias('动漫图片');
+  ctx
+    .command('cosplay', { authority: 2 })
+    .option('format', '-f [json|null]', { fallback: 'json' })
+    .action(async ({ options, session }) => {
+      if (options?.format === 'json') {
+        const rst = await ctx.http.get(cosplayPicApi, { params: options });
+        return segment('image', { url: rst?.imgurl });
+      } else {
+        const rst = await ctx.http.get(cosplayPicApi, { params: options, responseType: 'arraybuffer' });
+        return segment('image', { url: `data:image/*;base64,${rst.toString('base64')}` });
+      }
+    })
+    .alias('cosplay');
 
   // B站
   ctx
@@ -199,6 +214,8 @@ export function apply(ctx: Context) {
   // 转语音
   ctx
     .command('voice <type:text>', { authority: 2 })
+    .option('speed', '-sp [语速（1-15）]', { fallback: '1' })
+    .option('speaker', '-sr [种类（1-6）]', { fallback: '1' })
     .action(async ({ options, session }, type) => {
       if (!type) return '请输入需要转换的内容';
       const rst = await ctx.http.get(voiceApi, { params: options, responseType: 'arraybuffer' });
