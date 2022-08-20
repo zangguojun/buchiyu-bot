@@ -39,6 +39,7 @@
     "esbuild": "^0.15.2",
     "esbuild-register": "^3.3.3",
     "eslint": "^8.22.0",
+    "prettier": "^2.7.1",
     "typescript": "^4.7.4",
     "yakumo": "^0.3.3",
     "yakumo-publish": "^0.3.0",
@@ -63,6 +64,7 @@
     "@koishijs/plugin-schedule": "^4.3.0",
     "@koishijs/plugin-status": "^6.1.4",
     "koishi": "^4.8.5",
-    "koishi-plugin-gocqhttp": "^3.0.3"
+    "koishi-plugin-gocqhttp": "^3.0.3",
+    "ts-dedent": "^2.2.0"
   }
 }
