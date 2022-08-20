@@ -18,8 +18,10 @@ const str2QrApi = 'https://api.muxiaoguo.cn/api/Qrcode?api_key=0b702cf348c151c7'
 
 export function apply(ctx: Context) {
   // 天气相关
-  ctx
-    .command('天气', { authority: 2 })
+  const weather = ctx.command('weather', { authority: 2 });
+
+  weather
+    .subcommand('.today', { checkArgCount: true })
     .option('city', '-c [城市名称]', { fallback: '余杭' })
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(weatherApi, { params: { ...options, type: 1 } });
@@ -31,27 +33,38 @@ export function apply(ctx: Context) {
       风力：${WS}/${WD}
       湿度：${SD}
       `;
-    });
-  ctx.command('未来天气 <city:text>', { authority: 2 }).action(async ({ options, session }, city = '余杭') => {
-    const rst = await ctx.http.get(weatherApi, { params: { type: 2, city } });
-    return rst?.data
-      ?.slice(0, 2)
-      .map((item) => {
-        const { day, weather, celsius, wind_direction_1, wind_direction_2, wind_level } = item;
-        return dedent`
-        城市: ${city}
+    })
+    .alias('天气');
+
+  weather
+    .subcommand('.recent <day:number>', { checkArgCount: true })
+    .option('city', '-c [城市名称]', { fallback: '余杭' })
+    .action(async ({ options, session }, day = 2) => {
+      const rst = await ctx.http.get(weatherApi, { params: { ...options, type: 2 } });
+      return rst?.data
+        ?.slice(0, day)
+        .map((item) => {
+          const { day, weather, celsius, wind_direction_1, wind_direction_2, wind_level } = item;
+          return dedent`
+        城市: ${options?.city}
         日期: ${day}
         天气: ${weather}
         温度: ${celsius}
         风力：${[wind_direction_1, wind_direction_2, wind_level].join('/')}
       `;
-      })
-      .join('');
-  });
-  ctx.command('降雨 <city:text>', { authority: 2 }).action(async ({ options, session }, city = '余杭') => {
-    const rst = await ctx.http.get(weatherApi, { params: { type: 4, city } });
-    return rst?.data?.forecast;
-  });
+        })
+        .join('\n\n');
+    })
+    .alias('最近天气');
+
+  weather
+    .subcommand('.rainfall', { checkArgCount: true })
+    .option('city', '-c [城市名称]', { fallback: '余杭' })
+    .action(async ({ options, session }) => {
+      const rst = await ctx.http.get(weatherApi, { params: { ...options, type: 4 } });
+      return rst?.data?.forecast;
+    })
+    .alias('降雨');
 
   // 图片
   ctx
@@ -71,42 +84,37 @@ export function apply(ctx: Context) {
     });
 
   // B站
-  ctx
-    .command('bili', { authority: 2 })
-    .option('blnum', '-b [AV号|BV号]')
-    .action(async ({ options, session }) => {
-      const rst = await ctx.http.get(biliApi, { params: options });
-      const { pic, title, desc } = rst?.data;
-      return segment.join([
-        { type: 'image', data: { url: pic } },
-        {
-          type: 'text',
-          data: {
-            content: dedent`
+  ctx.command('bili <blnum:text>', { authority: 2 }).action(async ({ options, session }, blnum) => {
+    const rst = await ctx.http.get(biliApi, { params: { blnum } });
+    const { pic, title, desc } = rst?.data;
+    return segment.join([
+      { type: 'image', data: { url: pic } },
+      {
+        type: 'text',
+        data: {
+          content: dedent`
         标题：${title}
         详情：${desc}
         `,
-          },
         },
-      ]);
-    });
+      },
+    ]);
+  });
 
   // 热词搜索
-  ctx
-    .command('hot', { authority: 2 })
-    .option('word', '-w [xswl|yyds]')
-    .action(async ({ options, session }) => {
-      const rst = await ctx.http.get(hotWordApi, { params: options });
-      return rst?.data[0]?.desc;
-    });
+  ctx.command('hot <word:text>', { authority: 2 }).action(async ({ options, session }, word) => {
+    const rst = await ctx.http.get(hotWordApi, { params: { word } });
+    return rst?.data[0]?.desc;
+  });
 
   // 搜狗/百科
   ctx
     .command('search', { authority: 2 })
     .option('word', '-w [百科]')
     .action(async ({ options, session }) => {
-      const rst = await ctx.http.get(searchApi, { params: options });
-      return rst?.data[0]?.desc;
+      // TODO: api异常
+      // const rst = await ctx.http.get(searchApi, { params: options });
+      // return rst?.data[0]?.desc;
     });
 
   // now
@@ -120,13 +128,13 @@ export function apply(ctx: Context) {
 
   // qr
   ctx
-    .command('qr <word:text>', { authority: 2 })
-    .option('e', '-e [L:7%;M:15%;Q:25%;H:30%修正]', { fallback: 'L' })
-    .option('size', '-s [尺寸:50-800px]', { fallback: '800' })
-    .option('frame', '-f [边框尺寸:1-10px]', { fallback: '2' })
+    .command('qr <text:text>', { authority: 2 })
+    .option('e', '-e [L:7%;M:15%;Q:25%;H:30%修正]', { fallback: 'H' })
+    .option('size', '-s [尺寸:50-800px]', { fallback: 800 })
+    .option('frame', '-f [边框尺寸:1-10px]', { fallback: 1 })
     .option('type', '-t [img:输出图片;base64:输出编码后的文本;text:编码后矩阵]', { fallback: 'base64' })
-    .action(async ({ options, session }, word) => {
-      const rst = await ctx.http.get(str2QrApi, { params: { ...options, word } });
-      return segment('image', { url: rst?.data?.base64 });
+    .action(async ({ options, session }, text) => {
+      const rst = await ctx.http.get(str2QrApi, { params: { ...options, text } });
+      return segment('image', { url: `data:image/*;base64,${rst?.data?.base64}` });
     });
 }
