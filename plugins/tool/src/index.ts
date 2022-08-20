@@ -13,6 +13,7 @@ const nowApi = 'https://api.vvhan.com/api/ipCard';
 const str2QrApi = 'https://api.muxiaoguo.cn/api/Qrcode?api_key=0b702cf348c151c7';
 
 const hotListApi = 'https://api.vvhan.com/api/hotlist';
+const voiceApi = 'https://api.vvhan.com/api/song';
 
 export function apply(ctx: Context) {
   // 天气相关
@@ -194,4 +195,14 @@ export function apply(ctx: Context) {
       return segment.join(segmentArray.flat());
     })
     .alias('热搜');
+
+  // 转语音
+  ctx
+    .command('voice <type:text>', { authority: 2 })
+    .action(async ({ options, session }, type) => {
+      if (!type) return '请输入需要转换的内容'
+      const rst = await ctx.http.get(voiceApi, { params: options, responseType: 'arraybuffer' });
+      return segment('audio', { url: `data:image/*;base64,${rst.toString('base64')}` });
+    })
+    .alias('转语音');
 }
