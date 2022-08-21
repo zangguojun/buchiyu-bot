@@ -11,6 +11,7 @@ plugins:
   status: null
   sandbox: null
   everyday: null
+  signin: null
   tool: null
   shop:
     discountGroup:
@@ -32,3 +33,4 @@ plugins:
   database-mysql:
     host: ${{ env.MYSQL_HOST }}
     password: ${{ env.MYSQL_PWD }}
+  schedule: {}

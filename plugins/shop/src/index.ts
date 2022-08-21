@@ -47,12 +47,12 @@ export function apply(ctx: Context, { discountGroup, master }: Config) {
   });
 
   ctx.using(['database'], (ctx) => {
-    const cmd = ctx.command('shop [operation:string] <keyword:keyword>');
+    const cmd = ctx.command('shop [operation:string] <keyword:text>');
 
     const register = (def: string, callback: Command.Action<never, 'shopKeywords', [string]>) =>
       cmd.subcommand(def, { checkArgCount: true }).channelFields(['shopKeywords']).action(callback);
 
-    register('.add <keyword:keyword>', async ({ session }, keyword) => {
+    register('.add <keyword:text>', async ({ session }, keyword) => {
       const { shopKeywords } = session.channel;
       if (shopKeywords.includes(keyword)) {
         return session.text(`${keyword} 已经是关键词啦！`);
