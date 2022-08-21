@@ -12,9 +12,8 @@ const nowApi = 'https://api.vvhan.com/api/ipCard';
 const str2QrApi = 'https://api.muxiaoguo.cn/api/Qrcode?api_key=0b702cf348c151c7';
 
 const hotListApi = 'https://api.vvhan.com/api/hotlist';
-const voiceApi = 'https://api.vvhan.com/api/song';
-
 const cosplayPicApi = 'https://api.dzzui.com/api/cosplay';
+const voiceApi = 'https://api.vore.top/api/TTS';
 const searchApi = 'https://api.muxiaoguo.cn/api/Baike?api_key=3eacaebf9af521d3';
 
 export function apply(ctx: Context) {
@@ -213,13 +212,13 @@ export function apply(ctx: Context) {
 
   // 转语音
   ctx
-    .command('voice <type:text>', { authority: 2 })
-    .option('speed', '-sp [语速（1-15）]', { fallback: '1' })
-    .option('speaker', '-sr [种类（1-6）]', { fallback: '1' })
-    .action(async ({ options, session }, type) => {
-      if (!type) return '请输入需要转换的内容';
-      const rst = await ctx.http.get(voiceApi, { params: options, responseType: 'arraybuffer' });
-      return segment('audio', { url: `base64://${rst.toString('base64')}` });
+    .command('voice <text:text>', { authority: 2 })
+    // .option('speed', '-sp [语速（1-15）]', { fallback: '1' })
+    // .option('speaker', '-sr [种类（1-6）]', { fallback: '1' })
+    .action(async ({ options, session }, text) => {
+      if (!text) return '请输入需要转换的内容';
+      const rst = await ctx.http.get(voiceApi, { params: { ...options, text } });
+      return segment('audio', { url: rst?.data?.download });
     })
     .alias('转语音');
 }
