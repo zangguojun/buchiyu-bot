@@ -94,7 +94,7 @@ export function apply(ctx: Context) {
         return segment('image', { url: rst?.imgurl });
       } else {
         const rst = await ctx.http.get(cosplayPicApi, { params: options, responseType: 'arraybuffer' });
-        return segment('image', { url: `data:image/*;base64,${rst.toString('base64')}` });
+        return segment('image', { url: `base64://${rst.toString('base64')}` });
       }
     })
     .alias('cosplay');
@@ -146,7 +146,7 @@ export function apply(ctx: Context) {
     .option('tip', '-t [标题]')
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(nowApi, { params: options, responseType: 'arraybuffer' });
-      return segment('image', { url: `data:image/*;base64,${rst.toString('base64')}` });
+      return segment('image', { url: `base64://${rst.toString('base64')}` });
     })
     .alias('签到');
 
@@ -166,7 +166,7 @@ export function apply(ctx: Context) {
         const rst = await ctx.http.get(str2QrApi, { params: { ...options, text } });
         base64Str = rst?.data?.base64;
       }
-      return segment('image', { url: `data:image/*;base64,${base64Str}` });
+      return segment('image', { url: `base64://${base64Str}` });
     })
     .alias('转二维码');
 
@@ -219,7 +219,7 @@ export function apply(ctx: Context) {
     .action(async ({ options, session }, type) => {
       if (!type) return '请输入需要转换的内容';
       const rst = await ctx.http.get(voiceApi, { params: options, responseType: 'arraybuffer' });
-      return segment('audio', { url: `data:audio/*;base64,${rst.toString('base64')}` });
+      return segment('audio', { url: `base64://${rst.toString('base64')}` });
     })
     .alias('转语音');
 }
