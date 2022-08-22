@@ -1,4 +1,5 @@
 import { Command, Context, Schema, Session } from 'koishi';
+import dedent from 'ts-dedent';
 
 declare module 'koishi' {
   interface User {
@@ -17,6 +18,31 @@ const platformMap = {
 };
 
 export function apply(ctx: Context) {
+  const juejinDone = async (key) => {
+    const juejinCheckInApi = 'https://api.juejin.cn/growth_api/v1/check_in';
+    const juejinDrawApi = 'https://api.juejin.cn/growth_api/v1/lottery/draw';
+    const checkInData = await ctx.http.post(juejinCheckInApi, {}, { headers: { Cookie: key } });
+    const drawData = await ctx.http.post(juejinDrawApi, {}, { headers: { Cookie: key } });
+    let msg = [`掘金(${key.slice(0, 5)})`];
+    if (!checkInData?.data) {
+      msg.push(`签到失败：${checkInData?.err_msg}`);
+    } else {
+      const {
+        data: { incr_point, sum_point },
+      } = checkInData;
+      msg.push(`签到成功：获得${incr_point}矿石，当前总矿石：${sum_point}`);
+    }
+    if (!drawData?.data) {
+      msg.push(`免费抽奖失败：${drawData?.err_msg}`);
+    } else {
+      const {
+        data: { lottery_name, draw_lucky_value, total_lucky_value },
+      } = drawData;
+      msg.push(`免费抽奖成功：获得${lottery_name}、${draw_lucky_value}幸运值（${total_lucky_value}/6000）`);
+    }
+    return msg;
+  };
+
   ctx.before('attach-user', (session, fields) => {
     fields.add('juejin');
   });
@@ -38,7 +64,7 @@ export function apply(ctx: Context) {
       });
     };
 
-    register('.add <key:string>', async ({ session, command }, key) => {
+    register('.add <key:text>', async ({ session, command }, key) => {
       const curKey = command?.name.split('.')[1];
       const curKeyArray = session?.user[curKey];
 
@@ -65,7 +91,7 @@ export function apply(ctx: Context) {
       }
     });
 
-    register('.rm <key:string>', async ({ session, command }, key) => {
+    register('.rm <key:text>', async ({ session, command }, key) => {
       const curKey = command?.name.split('.')[1];
       const curKeyArray = session?.user[curKey];
       const index = curKeyArray.findIndex((k) => k.startsWith(key));
@@ -90,6 +116,22 @@ export function apply(ctx: Context) {
       const curKeyArray = session?.user[curKey];
       if (!curKeyArray.length) return session.text('暂无凭证');
       return [session.text(`${platformMap[curKey]}凭证列表：`), ...curKeyArray].join('\n');
+    });
+
+    register('.done', async ({ session, command }) => {
+      const curKey = command?.name.split('.')[1];
+      const curKeyArray = session?.user[curKey];
+      let msg;
+      for await (const key of curKeyArray) {
+        switch (curKey) {
+          case 'juejin':
+            msg = await juejinDone(key);
+            break;
+          default:
+            console.log('Error ');
+        }
+      }
+      return session.text(msg.join('\n'));
     });
   });
 }
