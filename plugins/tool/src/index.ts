@@ -21,7 +21,7 @@ export function apply(ctx: Context) {
   const weather = ctx.command('weather', { authority: 2 });
 
   weather
-    .subcommand('.today', { checkArgCount: true })
+    .subcommand('.today')
     .option('city', '-c [城市名称]', { fallback: '余杭' })
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(weatherApi, { params: { ...options, type: 1 } });
@@ -37,7 +37,7 @@ export function apply(ctx: Context) {
     .alias('天气');
 
   weather
-    .subcommand('.recent <day:number>', { checkArgCount: true })
+    .subcommand('.recent <day:number>', { checkArgCount: false })
     .option('city', '-c [城市名称]', { fallback: '余杭' })
     .action(async ({ options, session }, day = 2) => {
       const rst = await ctx.http.get(weatherApi, { params: { ...options, type: 2 } });
@@ -50,7 +50,7 @@ export function apply(ctx: Context) {
         日期: ${day}
         天气: ${weather}
         温度: ${celsius}
-        风力：${[wind_direction_1, wind_direction_2, wind_level].join('/')}
+        风力：${[wind_direction_1, wind_direction_2, wind_level].filter((i) => i).join('/')}
       `;
         })
         .join('\n\n');
@@ -100,7 +100,7 @@ export function apply(ctx: Context) {
 
   // B站
   ctx
-    .command('bili <blnum:text>', { authority: 2 })
+    .command('bili <blnum:text>', { checkArgCount: true, authority: 2 })
     .action(async ({ options, session }, blnum) => {
       const rst = await ctx.http.get(biliApi, { params: { blnum } });
       const { pic, title, desc } = rst?.data;
@@ -121,7 +121,7 @@ export function apply(ctx: Context) {
 
   // 热词搜索
   ctx
-    .command('stem <word:text>', { authority: 2 })
+    .command('stem <word:text>', { checkArgCount: true, authority: 2 })
     .action(async ({ options, session }, word) => {
       const rst = await ctx.http.get(hotWordApi, { params: { word } });
       return rst?.data[0]?.desc;
@@ -151,7 +151,7 @@ export function apply(ctx: Context) {
 
   // qr
   ctx
-    .command('qr <text:text>', { authority: 2 })
+    .command('qr <text:text>', { checkArgCount: true, authority: 2 })
     .option('e', '-e [L:7%;M:15%;Q:25%;H:30%修正]', { fallback: 'H' })
     .option('size', '-s [尺寸:50-800px]', { fallback: 800 })
     .option('frame', '-f [边框尺寸:1-10px]', { fallback: 1 })
@@ -186,7 +186,7 @@ export function apply(ctx: Context) {
     微信: 'wxHot',
   };
   ctx
-    .command('hot <type:text>', { authority: 2 })
+    .command('hot <type:text>', { checkArgCount: false, authority: 2 })
     .action(async ({ options, session }, type) => {
       const rst = await ctx.http.get(hotListApi, { params: { type: hotMap[type] || 'bili' } });
       const segmentArray = rst.data.slice(0, 5)?.map((item) => {
@@ -212,7 +212,7 @@ export function apply(ctx: Context) {
 
   // 转语音
   ctx
-    .command('voice <text:text>', { authority: 2 })
+    .command('voice <text:text>', { checkArgCount: true, authority: 2 })
     // .option('speed', '-sp [语速（1-15）]', { fallback: '1' })
     // .option('speaker', '-sr [种类（1-6）]', { fallback: '1' })
     .action(async ({ options, session }, text) => {
