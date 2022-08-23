@@ -27,23 +27,19 @@ export function apply(ctx: Context, { discountGroup, master }: Config) {
     shopKeywords: 'list',
   });
 
-  ctx.middleware((_: Session<'shopKeywords', never>, next) => {
-    const { user, bot } = _;
+  ctx.app.guild(...discountGroup).on('message', async (session: Session<'shopKeywords', never>) => {
+    const { user, bot } = session;
     const { shopKeywords } = user || {};
-    ctx.app.guild(...discountGroup).on('message', async (session) => {
-      for await (const keyword of shopKeywords) {
-        if (session.content.includes(keyword)) {
-          await bot.sendPrivateMessage(
-            master,
-            `${new Date(session.timestamp).toLocaleString('zh', { timeZone: 'Asia/shanghai', hour12: false })}\n${
-              session.content
-            }`,
-          );
-        }
+    for await (const keyword of shopKeywords) {
+      if (session.content.includes(keyword)) {
+        await bot.sendPrivateMessage(
+          master,
+          `${new Date(session.timestamp).toLocaleString('zh', { timeZone: 'Asia/shanghai', hour12: false })}\n${
+            session.content
+          }`,
+        );
       }
-    });
-
-    return next();
+    }
   });
 
   ctx.using(['database'], (ctx) => {
