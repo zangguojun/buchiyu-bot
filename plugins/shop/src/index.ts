@@ -1,4 +1,5 @@
 import { Command, Context, Schema, Session } from 'koishi';
+import '@koishijs/plugin-adapter-onebot';
 
 declare module 'koishi' {
   interface User {
@@ -27,20 +28,39 @@ export function apply(ctx: Context, { discountGroup, master }: Config) {
     shopKeywords: 'list',
   });
 
-  ctx.app.guild(...discountGroup).on('message', async (session: Session<'shopKeywords', never>) => {
-    const { user, bot } = session;
-    const { shopKeywords } = user || {};
+  ctx.guild().middleware(async (session: Session<'shopKeywords', never>, next) => {
+    const { user, bot, content, timestamp } = session;
+    const { shopKeywords } = user;
     for await (const keyword of shopKeywords) {
-      if (session.content.includes(keyword)) {
-        await bot.sendPrivateMessage(
+      if (content.includes(keyword)) {
+        await bot?.sendPrivateMessage(
           master,
-          `${new Date(session.timestamp).toLocaleString('zh', { timeZone: 'Asia/shanghai', hour12: false })}\n${
-            session.content
-          }`,
+          `${new Date(timestamp).toLocaleString('zh', { timeZone: 'Asia/shanghai', hour12: false })}\n${content}`,
         );
       }
     }
+
+    return next();
   });
+
+  // ctx.middleware((_: Session<'shopKeywords', never>, next) => {
+  //   const { user, bot } = _;
+  //   const { shopKeywords } = user || {};
+  //   ctx.app.guild(...discountGroup).on('message', async (session) => {
+  //     for await (const keyword of shopKeywords) {
+  //       if (session.content.includes(keyword)) {
+  //         await bot.sendPrivateMessage(
+  //           master,
+  //           `${new Date(session.timestamp).toLocaleString('zh', { timeZone: 'Asia/shanghai', hour12: false })}\n${
+  //             session.content
+  //           }`,
+  //         );
+  //       }
+  //     }
+  //   });
+  //
+  //   return next();
+  // });
 
   ctx.using(['database'], (ctx) => {
     const cmd = ctx.command('shop [operation:string] <keyword:text>');
