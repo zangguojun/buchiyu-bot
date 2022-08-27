@@ -113,7 +113,7 @@ export function apply(ctx: Context) {
 
     register('.ls', async ({ session, command }) => {
       const curKey = command?.name.split('.')[1];
-      const curKeyArray = session?.user[curKey];
+      const curKeyArray = session?.user[curKey].map(i => i.slice(0, 5))
       if (!curKeyArray.length) return session.text('暂无凭证');
       return [session.text(`${platformMap[curKey]}凭证列表：`), ...curKeyArray].join('\n');
     });
