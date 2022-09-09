@@ -65,6 +65,7 @@
     "@koishijs/plugin-status": "^6.1.4",
     "koishi": "^4.8.5",
     "koishi-plugin-gocqhttp": "^3.0.3",
+    "lodash": "^4.17.21",
     "ts-dedent": "^2.2.0"
   }
 }
