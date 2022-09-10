@@ -48,6 +48,7 @@ export function apply(ctx: Context) {
       await session.bot.handleGuildMemberRequest(messageId, false, `该群已满，请加${notFull.join('，')}`);
     }
   });
+
   // 处理踢人请求
   ctx.on('message', async (session) => {
     const { messageId, content, guildId, userId } = session;
@@ -55,6 +56,7 @@ export function apply(ctx: Context) {
       await session.onebot.setGroupKick(guildId, userId);
     }
   });
+
   // 查看一人多群
   ctx.on('message', async (session) => {
     const { messageId, content, guildId, userId } = session;
@@ -68,7 +70,6 @@ export function apply(ctx: Context) {
           const intersection = _.intersectionBy(otherMember, memberList, 'user_id').filter(
             (item) => item?.role === 'member',
           );
-
           const privateMsgTasks = intersection.map((item) => {
             const { group_id, user_id } = item;
             return session.onebot?.sendPrivateMsg(
@@ -77,7 +78,6 @@ export function apply(ctx: Context) {
             );
           });
           await Promise.all([].concat(privateMsgTasks, privateMsgTasks));
-
           const delMemberTasks = intersection.map((item) => {
             const { group_id, user_id } = item;
             return session.onebot?.setGroupKick(group_id, user_id);
