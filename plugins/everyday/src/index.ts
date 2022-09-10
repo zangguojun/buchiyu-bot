@@ -11,25 +11,47 @@ const masterGuildList = ['#', '532250819'];
 export function apply(ctx: Context) {
   // 处理加群请求
   ctx.on('guild-member-request', async (session) => {
-    const { messageId, guildId } = session;
+    const { messageId, guildId, userId } = session;
+    const memberListTasks = guildList.map((g) => {
+      return session.onebot?.getGroupMemberList(g);
+    });
+    const allMemberList = await Promise.all(memberListTasks);
+    for (const memberList of allMemberList) {
+      const existUser = memberList.find((member) => member.user_id == userId);
+      if (existUser) {
+        await session.bot.handleGuildMemberRequest(
+          messageId,
+          false,
+          `您已经加入了其他资源群(${existUser.group_id})，所有群内的资料相同！`,
+        );
+        return;
+      }
+    }
+
     const { max_member_count, member_count } = await session.onebot.getGroupInfo(guildId);
     if (max_member_count > member_count) {
       await session.bot.handleGuildMemberRequest(messageId, true);
     } else {
-      let confuseText = '该群已满!';
-      let index = 1;
-      for await (const gId of guildList) {
-        const { max_member_count, member_count } = await session.onebot.getGroupInfo(gId);
-        confuseText += `${index++}群：${gId}(${member_count}/${max_member_count})；`;
+      const notFull = [];
+      const memberNumberListTasks = guildList
+        .filter((g) => g !== Number(guildId))
+        .map((g) => {
+          return session.onebot?.getGroupInfo(g);
+        });
+      const memberNumberList = await Promise.all(memberNumberListTasks);
+      for (const memberList of memberNumberList) {
+        const { max_member_count, member_count, group_id } = await session.onebot.getGroupInfo(guildId);
+        if (max_member_count > member_count) {
+          notFull.push(group_id);
+        }
       }
-      await session.bot.handleGuildMemberRequest(messageId, false, confuseText);
+      await session.bot.handleGuildMemberRequest(messageId, false, `该群已满，请加${notFull.join('，')}`);
     }
   });
   // 处理踢人请求
   ctx.on('message', async (session) => {
     const { messageId, content, guildId, userId } = session;
     if (guildList.includes(Number(guildId)) && content === '【我想退群了】') {
-      // await session.onebot.deleteMsg(messageId)
       await session.onebot.setGroupKick(guildId, userId);
     }
   });
