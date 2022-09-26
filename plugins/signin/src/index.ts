@@ -21,8 +21,26 @@ export function apply(ctx: Context) {
   const juejinDone = async (key) => {
     const juejinCheckInApi = 'https://api.juejin.cn/growth_api/v1/check_in';
     const juejinDrawApi = 'https://api.juejin.cn/growth_api/v1/lottery/draw';
+    const juejinGlobalBigApi = 'https://api.juejin.cn/growth_api/v1/lottery_history/global_big';
+    const juejinDipLuckyApi = 'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky';
     const checkInData = await ctx.http.post(juejinCheckInApi, {}, { headers: { Cookie: key } });
     const drawData = await ctx.http.post(juejinDrawApi, {}, { headers: { Cookie: key } });
+    const globalBigData = await ctx.http.post(
+      juejinGlobalBigApi,
+      {
+        page_no: 1,
+        page_size: 5,
+      },
+      { headers: { Cookie: key } },
+    );
+    const dipLuckyData = await ctx.http.post(
+      juejinDipLuckyApi,
+      {
+        lottery_history_id: globalBigData?.data?.lotteries?.[0]?.history_id,
+      },
+      { headers: { Cookie: key } },
+    );
+
     let msg = [`掘金(${key.slice(0, 5)})`];
     if (!checkInData?.data) {
       msg.push(`签到失败：${checkInData?.err_msg}`);
@@ -39,6 +57,19 @@ export function apply(ctx: Context) {
         data: { lottery_name, draw_lucky_value, total_lucky_value },
       } = drawData;
       msg.push(`免费抽奖成功：获得${lottery_name}、${draw_lucky_value}幸运值（${total_lucky_value}/6000）`);
+    }
+    if (!globalBigData?.data) {
+      msg.push(`获取历史中奖人失败：${globalBigData?.err_msg}`);
+    } else {
+      msg.push(`获取历史中奖人成功`);
+    }
+    if (dipLuckyData?.data?.has_dip) {
+      msg.push(`沾喜气失败：今天你已经沾过喜气，明天再来吧！`);
+    } else {
+      const {
+        data: { dip_action, dip_value, total_value },
+      } = dipLuckyData;
+      msg.push(`第${dip_action}次沾喜气成功：获得${dip_value}幸运值（${total_value}/6000）`);
     }
     return msg;
   };
@@ -113,7 +144,7 @@ export function apply(ctx: Context) {
 
     register('.ls', async ({ session, command }) => {
       const curKey = command?.name.split('.')[1];
-      const curKeyArray = session?.user[curKey].map(i => i.slice(0, 5))
+      const curKeyArray = session?.user[curKey].map((i) => i.slice(0, 5));
       if (!curKeyArray.length) return session.text('暂无凭证');
       return [session.text(`${platformMap[curKey]}凭证列表：`), ...curKeyArray].join('\n');
     });
