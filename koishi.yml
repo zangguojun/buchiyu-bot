@@ -1,37 +1,28 @@
 port: 5140
 maxPort: 5149
 plugins:
-  help: null
-  console:
-    open: false
-  logger: null
+  groupchat: {}
+  lol: {}
+  filmmaker: {}
+  everyday: {}
+  tool: {}
+  signin: {}
   market:
     search:
       endpoint: ${{ env.GITHUB_CONTENT_MIRROR }}/koishijs/registry/dist/index.json
-  status: null
-  sandbox: null
-  everyday: null
-  signin: null
-  tool: null
-  shop:
-    discountGroup:
-      - '532250819'
-      - '724924039'
-      - '452055642'
-      - '#'
-    master: '1739932260'
-  repeater: {}
-  gocqhttp: {}
   adapter-onebot:
-    gocqhttp:
-      enabled: true
-      password: ${{ env.PWD }}
     selfId: ${{ env.QQ }}
     protocol: ws
-    endpoint: ws://127.0.0.1:6700
-  echo: {}
-  dataview: {}
+    endpoint: ${{ env.WS }}
+    token: ${{ env.TOKEN }}
   database-mysql:
     host: ${{ env.MYSQL_HOST }}
     password: ${{ env.MYSQL_PWD }}
+  console:
+    open: false
+  help: {}
+  logger: {}
+  status: {}
+  dataview: {}
   schedule: {}
+  sandbox: {}

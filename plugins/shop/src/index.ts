@@ -40,7 +40,7 @@ export function apply(ctx: Context, { discountGroup, master }: Config) {
       }
     }
 
-    return next();
+    await next();
   });
 
   // ctx.middleware((_: Session<'shopKeywords', never>, next) => {

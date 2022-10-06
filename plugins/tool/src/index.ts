@@ -1,5 +1,6 @@
 import { Context, Schema, segment } from 'koishi';
 import dedent from 'ts-dedent';
+import { text } from 'stream/consumers';
 
 export const name = 'tool';
 
@@ -104,18 +105,27 @@ export function apply(ctx: Context) {
     .action(async ({ options, session }, blnum) => {
       const rst = await ctx.http.get(biliApi, { params: { blnum } });
       const { pic, title, desc } = rst?.data;
-      return segment.join([
-        { type: 'image', data: { url: pic } },
-        {
-          type: 'text',
-          data: {
-            content: dedent`
+      // return segment.join([
+      //   { type: 'image', data: { url: pic } },
+      //   {
+      //     type: 'text',
+      //     data: {
+      //       content: dedent`
+      //       标题：${title}
+      //       详情：${desc}
+      //       `,
+      //     },
+      //   },
+      // ]);
+      return [
+        segment('image', { url: pic }),
+        segment('text', {
+          content: dedent`
             标题：${title}
             详情：${desc}
             `,
-          },
-        },
-      ]);
+        }),
+      ].join('');
     })
     .alias('B站解析');
 

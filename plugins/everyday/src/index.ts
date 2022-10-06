@@ -17,7 +17,9 @@ export function apply(ctx: Context) {
     });
     const allMemberList = await Promise.all(memberListTasks);
     for (const memberList of allMemberList) {
-      const existUser = memberList.find((member) => member.user_id == userId);
+      const existUser = memberList.find((member) => {
+        return String(member.user_id) === userId;
+      });
       if (existUser) {
         await session.bot.handleGuildMemberRequest(
           messageId,
