@@ -22,16 +22,18 @@ const statements = [
 ];
 
 export function apply(ctx: Context) {
-  ctx.guild().middleware(async (session: Session, next) => {
+  ctx.guild(...['1058072004', '532250819']).middleware(async (session: Session, next) => {
     const {
       bot,
       content,
+      channelId,
       author: { userId, username },
     } = session;
-    if (content.includes('<at id="2647653330"/>')) {
+    if (content.includes('<at id="2637653330"/>')) {
       const selectedStatement = _sample(statements);
-      await bot?.sendPrivateMessage('1739932260', `${username}(${userId}) => ${content}`);
-      return selectedStatement;
+      await bot?.sendPrivateMessage('1739932260', `${username}(${userId}): ${content} => ${selectedStatement}`);
+      await bot?.sendMessage(channelId, selectedStatement);
+      // return session.text(selectedStatement);
     }
     await next();
   });

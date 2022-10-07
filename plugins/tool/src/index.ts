@@ -16,11 +16,11 @@ const hotListApi = 'https://api.vvhan.com/api/hotlist';
 const cosplayPicApi = 'https://api.dzzui.com/api/cosplay';
 const voiceApi = 'https://api.vore.top/api/TTS';
 const searchApi = 'https://api.muxiaoguo.cn/api/Baike?api_key=3eacaebf9af521d3';
+const zfbApi = 'https://mm.cqu.cc/share/zhifubaodaozhang/mp3';
 
 export function apply(ctx: Context) {
   // 天气相关
   const weather = ctx.command('weather', { authority: 2 });
-
   weather
     .subcommand('.today')
     .option('city', '-c [城市名称]', { fallback: '余杭' })
@@ -67,15 +67,17 @@ export function apply(ctx: Context) {
     })
     .alias('降雨');
 
-  // 图片
+  // 美图
   ctx
     .command('mm', { authority: 2 })
     .option('num', '-n [图片数量]', { fallback: 1 })
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(beautyPicApi, { params: options });
-      return segment.join(rst?.data?.map((item) => ({ type: 'image', data: { url: item?.imgurl } })));
+      return rst?.data?.map((item) => segment('image', { url: item?.imgurl })).join();
     })
     .alias('美图');
+
+  // 动漫图片
   ctx
     .command('acg', { authority: 2 })
     .option('size', '-s [mw1024|mw690|bmiddle|small|thumb180|thumbnail|square]', { fallback: 'mw690' })
@@ -85,6 +87,8 @@ export function apply(ctx: Context) {
       return segment('image', { url: rst?.data.imgurl });
     })
     .alias('动漫图片');
+
+  // cosplay
   ctx
     .command('cosplay', { authority: 2 })
     .option('format', '-f [json|null]', { fallback: 'json' })
@@ -105,18 +109,6 @@ export function apply(ctx: Context) {
     .action(async ({ options, session }, blnum) => {
       const rst = await ctx.http.get(biliApi, { params: { blnum } });
       const { pic, title, desc } = rst?.data;
-      // return segment.join([
-      //   { type: 'image', data: { url: pic } },
-      //   {
-      //     type: 'text',
-      //     data: {
-      //       content: dedent`
-      //       标题：${title}
-      //       详情：${desc}
-      //       `,
-      //     },
-      //   },
-      // ]);
       return [
         segment('image', { url: pic }),
         segment('text', {
@@ -125,7 +117,7 @@ export function apply(ctx: Context) {
             详情：${desc}
             `,
         }),
-      ].join('');
+      ].join();
     })
     .alias('B站解析');
 
@@ -202,21 +194,18 @@ export function apply(ctx: Context) {
       const segmentArray = rst.data.slice(0, 5)?.map((item) => {
         const { title, desc, pic, hot, index } = item;
         const segmentList = [];
-        if (pic) segmentList.push({ type: 'image', data: { url: pic } });
+        if (pic) segmentList.push(segment('image', { url: pic }));
         return [
           ...segmentList,
-          {
-            type: 'text',
-            data: {
-              content: dedent`
+          segment('text', {
+            content: dedent`
                 ${index}、${title}  ${hot && hot}
                 ${!desc || title === desc ? '' : `详情：${desc}\n`}
                 `,
-            },
-          },
+          }),
         ];
       });
-      return segment.join(segmentArray.flat());
+      return segmentArray.flat().join();
     })
     .alias('热搜');
 
@@ -231,4 +220,12 @@ export function apply(ctx: Context) {
       return segment('audio', { url: rst?.data?.download });
     })
     .alias('转语音');
+
+  // 支付宝金额
+  ctx
+    .command('zfb <amount:text>', { checkArgCount: true, authority: 2 })
+    .action(async ({ options, session }, amount) => {
+      return segment('audio', { url: `${zfbApi}/${amount}.mp3` });
+    })
+    .alias('支付宝');
 }

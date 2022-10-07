@@ -3,7 +3,9 @@ maxPort: 5149
 plugins:
   groupchat: {}
   lol: {}
-  filmmaker: {}
+  filmmaker:
+    master:
+      - '1739932260'
   everyday: {}
   tool: {}
   signin: {}
@@ -26,3 +28,4 @@ plugins:
   dataview: {}
   schedule: {}
   sandbox: {}
+  rss: {}
