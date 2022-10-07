@@ -47,7 +47,11 @@ export function apply(ctx: Context) {
           notFull.push(group_id);
         }
       }
-      await session.bot.handleGuildMemberRequest(messageId, false, `该群已满，请加${notFull.join('，')}`);
+      await session.bot.handleGuildMemberRequest(
+        messageId,
+        false,
+        notFull.length === 0 ? '所有群都已满，请找群主' : `该群已满，请加${notFull.join('，')}`,
+      );
     }
   });
 
