@@ -69,7 +69,7 @@ export function apply(ctx: Context) {
 
   // 美图
   ctx
-    .command('mm', { authority: 2 })
+    .command('mm')
     .option('num', '-n [图片数量]', { fallback: 1 })
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(beautyPicApi, { params: options });
@@ -90,7 +90,7 @@ export function apply(ctx: Context) {
 
   // cosplay
   ctx
-    .command('cosplay', { authority: 2 })
+    .command('cosplay')
     .option('format', '-f [json|null]', { fallback: 'json' })
     .action(async ({ options, session }) => {
       if (options?.format === 'json') {
@@ -148,8 +148,7 @@ export function apply(ctx: Context) {
     .action(async ({ options, session }) => {
       const rst = await ctx.http.get(nowApi, { params: options, responseType: 'arraybuffer' });
       return segment('image', { url: `base64://${rst.toString('base64')}` });
-    })
-    .alias('签到');
+    });
 
   // qr
   ctx
@@ -211,7 +210,7 @@ export function apply(ctx: Context) {
 
   // 转语音
   ctx
-    .command('voice <text:text>', { checkArgCount: true, authority: 2 })
+    .command('voice <text:text>', { checkArgCount: true })
     // .option('speed', '-sp [语速（1-15）]', { fallback: '1' })
     // .option('speaker', '-sr [种类（1-6）]', { fallback: '1' })
     .action(async ({ options, session }, text) => {
@@ -223,7 +222,7 @@ export function apply(ctx: Context) {
 
   // 支付宝金额
   ctx
-    .command('zfb <amount:text>', { checkArgCount: true, authority: 2 })
+    .command('zfb <amount:text>', { checkArgCount: true })
     .action(async ({ options, session }, amount) => {
       return segment('audio', { url: `${zfbApi}/${amount}.mp3` });
     })

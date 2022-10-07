@@ -37,4 +37,21 @@ export function apply(ctx: Context) {
     }
     await next();
   });
+
+  ctx.guild(...['1058072004', '724924039', '532250819', '#']).middleware(async (session: Session, next) => {
+    const {
+      bot,
+      content,
+      guildId,
+      author: { userId, username },
+      onebot,
+    } = session;
+    const { last_sent_time } = await onebot?.getGroupMemberInfo(guildId, userId);
+    const silentTime = new Date().getTime() - last_sent_time;
+    // const
+    // if () {
+    //
+    // }
+    await next();
+  });
 }
