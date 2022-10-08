@@ -4,12 +4,13 @@ logger:
   levels:
     novelai: 3
     rss: 3
+    database-mysql: 3
 plugins:
   group:basic:
     market:
       search:
         endpoint: ${{ env.GITHUB_CONTENT_MIRROR }}/koishijs/registry/dist/index.json
-    adapter-onebot:
+    adapteAr-onebot:
       selfId: ${{ env.QQ }}
       protocol: ws
       endpoint: ${{ env.WS }}

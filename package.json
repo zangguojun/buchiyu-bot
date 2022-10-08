@@ -1,0 +1,73 @@
+{
+  "name": "buchiyu",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    ".env",
+    "koishi.yml"
+  ],
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "plugins/*"
+  ],
+  "scripts": {
+    "build": "koishi-scripts build",
+    "clean": "koishi-scripts clean",
+    "new": "koishi-scripts new",
+    "setup": "koishi-scripts setup",
+    "bump": "yakumo version",
+    "dep": "yakumo upgrade",
+    "pub": "yakumo publish",
+    "dev": "cross-env NODE_ENV=development koishi start -r esbuild-register -r yml-register --watch",
+    "start": "koishi start",
+    "yalc-push": "koishi-scripts build && yalc push --replace",
+    "watch": "nodemon --ignore lib/ --ignore node_modules/ --watch .yalc/ -C -e js --debug -x npm run yalc-push"
+  },
+  "yakumo": {
+    "require": [
+      "esbuild-register",
+      "yml-register"
+    ]
+  },
+  "devDependencies": {
+    "@iceworks/spec": "^1.6.0",
+    "@koishijs/client": "^4.6.6",
+    "@koishijs/scripts": "^3.2.4",
+    "@types/node": "^18.8.3",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.15.10",
+    "esbuild-register": "^3.3.3",
+    "eslint": "^8.24.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4",
+    "yakumo": "^0.3.6",
+    "yakumo-esbuild": "^0.3.17",
+    "yakumo-esbuild-yaml": "^0.3.1",
+    "yakumo-publish": "^0.3.0",
+    "yakumo-publish-sync": "^0.3.1",
+    "yakumo-tsc": "^0.3.5",
+    "yakumo-upgrade": "^0.3.2",
+    "yakumo-version": "^0.3.1",
+    "yml-register": "^1.1.0"
+  },
+  "dependencies": {
+    "@koishijs/cli": "^4.9.4",
+    "@koishijs/plugin-adapter-discord": "^3.2.2",
+    "@koishijs/plugin-adapter-onebot": "^5.2.0",
+    "@koishijs/plugin-adapter-telegram": "^3.4.2",
+    "@koishijs/plugin-console": "^4.6.6",
+    "@koishijs/plugin-database-mysql": "4.4.3",
+    "@koishijs/plugin-dataview": "^2.1.5",
+    "@koishijs/plugin-help": "^1.2.3",
+    "@koishijs/plugin-logger": "^2.1.5",
+    "@koishijs/plugin-market": "^1.3.11",
+    "@koishijs/plugin-sandbox": "^2.3.1",
+    "@koishijs/plugin-status": "^6.1.5",
+    "dayjs": "^1.11.5",
+    "koishi": "^4.9.4",
+    "lodash": "^4.17.21",
+    "tmp": "^0.2.1",
+    "ts-dedent": "^2.2.0"
+  }
+}
