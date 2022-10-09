@@ -1,5 +1,5 @@
 import { Command, Context, Schema, segment, Session } from 'koishi';
-import { compact as _compact } from 'lodash';
+import { compact as _compact, range as _range } from 'lodash';
 import tmp from 'tmp';
 import path from 'path';
 import fs from 'fs';
@@ -140,10 +140,45 @@ export function apply(ctx: Context, { master }: Config) {
     .alias('制作');
 
   ctx
-    .command('progress <tempId:string>', { checkArgCount: true, authority: 2 })
-    .action(async ({ options, session }, tempId) => {
-      const progress = await viewProgress(tempId);
+    .command('progress <taskId:string>', { checkArgCount: true, authority: 2 })
+    .action(async ({ options, session }, taskId) => {
+      const progress = await viewProgress(taskId);
       return segment('text', { content: `制作进度为：${progress}%` });
     })
     .alias('进度');
+
+  ctx
+    .command('aimk <tempId:string> <number:number> <tags:text>', { checkArgCount: true, authority: 2 })
+    .action(async ({ options, session }, tempId, number, tags) => {
+      if (!FFCreatorCenter.temps[tempId]) {
+        await initTemplate(tempId);
+      }
+      const imgDownloadTask = _range(number).map(async (index) => {
+        const { name, fd, removeCallback } = tmp.fileSync(tempConfig);
+        const rst = await ctx.http.get('http://91.216.169.75:5010/got_image', {
+          params: { token: 'mzlFYIL372cK5Ox4BN6EtSgwRJMu8kps', tags },
+          responseType: 'arraybuffer',
+        });
+        fs.writeFileSync(fd, rst);
+        session.send([`第${index + 1}个`, segment.image(rst)].join('\n'));
+        return { name, removeCallback };
+      });
+
+      const imgList = await Promise.all(imgDownloadTask);
+      const taskId = FFCreatorCenter.addTaskByTemplate(tempId, {
+        ...options,
+        imgList: imgList?.map((i) => i.name),
+      });
+      FFCreatorCenter.onTaskComplete(taskId, ({ file }) => {
+        const rst = fs.readFileSync(file);
+        session.send(segment('text', { content: `任务( ${taskId} )制作完成` }));
+        session.send(segment.video(rst));
+        fs.unlink(file, () => {
+          session.send(segment('text', { content: `已清理生产的视频文件` }));
+        });
+        imgList.forEach((i) => i.removeCallback());
+      });
+      return segment('text', { content: `任务( ${taskId} )创建成功，正在制作视频` });
+    })
+    .alias('AI制作');
 }
