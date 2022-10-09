@@ -1,5 +1,5 @@
 import { Context, Schema, Session, Command, segment } from 'koishi';
-import _ from 'lodash';
+import { intersectionBy as _intersectionBy } from 'lodash';
 import '@koishijs/plugin-adapter-telegram';
 import '@koishijs/plugin-adapter-onebot';
 
@@ -73,7 +73,7 @@ export function apply(ctx: Context) {
         });
         const [memberList, ...otherMemberList] = await Promise.all(memberListTasks);
         for (const otherMember of otherMemberList) {
-          const intersection = _.intersectionBy(otherMember, memberList, 'user_id').filter(
+          const intersection = _intersectionBy(otherMember, memberList, 'user_id').filter(
             (item) => item?.role === 'member',
           );
           const privateMsgTasks = intersection.map((item) => {
