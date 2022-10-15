@@ -80,9 +80,6 @@
     "ts-dedent": "^2.2.0"
   },
   "engines": {
-    "node": "16.17.0"
-  },
-  "os": [
-    "darwin"
-  ]
+    "node": "16.x"
+  }
 }
