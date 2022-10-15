@@ -10,7 +10,7 @@ plugins:
     market:
       search:
         endpoint: ${{ env.GITHUB_CONTENT_MIRROR }}/koishijs/registry/dist/index.json
-    adapteAr-onebot:
+    adapter-onebot:
       selfId: ${{ env.QQ }}
       protocol: ws
       endpoint: ${{ env.WS }}
