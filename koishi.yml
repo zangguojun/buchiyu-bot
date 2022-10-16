@@ -34,7 +34,7 @@ plugins:
     filmmaker:
       master:
         - '1739932260'
-        - 'Alice'
+        - Alice
     everyday: {}
     tool: {}
     signin: {}
