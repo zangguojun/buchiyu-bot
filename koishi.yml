@@ -33,15 +33,15 @@ plugins:
     lol: {}
     filmmaker:
       master:
-        - '1739932260'
+        - "1739932260"
         - Alice
     everyday: {}
     tool: {}
     signin: {}
     shop:
       discountGroup:
-        - '532250819'
-        - '724924039'
-        - '452055642'
-        - '#'
-      master: '1739932260'
+        - "532250819"
+        - "724924039"
+        - "452055642"
+        - "#"
+      master: "1739932260"
